@@ -4,8 +4,10 @@ from collections import OrderedDict
 
 class Metadata():
     chanceToHone = 0
-    totalCost = 0 
     addedChanceToSucceed = 0 
+    addCost = 0
+    totalCost = 0
+
     def getData(self):
         return [self.chanceToHone, self.totalCost, self.addCost, self.addedChanceToSucceed]
 
@@ -111,31 +113,32 @@ def simulate(metadata, runs, extraLogging, firstMoon=-1):
     currentH = h[secondRoundKey]
     for k, v in currentH.items():
         if "c" not in k and "p" not in k:
-            secondRound[int(k)] = (v - metadata.totalCost*currentH[k+"c"])/currentH[k+"c"]
+            secondRound[int(k)] = v/currentH[k+"c"]
     if len(secondRound) == 0:
         print(metadata.getString() + " Adds: {}".format(firstRoundMin))
         return
     secondRoundMin = min(secondRound, key=secondRound.get)
     if (extraLogging):
+        print("Using {} adds from round 1".format(firstRoundMin))
         for k, v in sorted(secondRound.items()):
             print("--R2 {} : {}, runs: {}".format(k, round(v, 2), currentH[str(k)+"c"]))
 
     thirdRound = {}
     thirdRoundKey = str(secondRoundMin) + "p"
-    currentH = h[thirdRoundKey]
+    currentH = h[secondRoundKey][thirdRoundKey]
     for k, v in currentH.items():
         if "c" not in k and "p" not in k:
-            thirdRound[int(k)] = (v - metadata.totalCost*currentH[k+"c"])/currentH[k+"c"]
+            thirdRound[int(k)] = v/currentH[k+"c"]
     if len(thirdRound) == 0:
         print(metadata.getString() + " Adds: {}, {}".format(firstRoundMin, secondRoundMin))
         return
     thirdRoundMin = min(thirdRound, key=thirdRound.get)
     if (extraLogging):
+        print("Using {} adds from round 2".format(secondRoundMin))
         for k, v in sorted(thirdRound.items()):
             print("----R3 {} : {}, runs: {}".format(k, round(v, 2), currentH[str(k)+"c"]))
 
     print(metadata.getString() + " Adds: {}, {}, {}".format(firstRoundMin, secondRoundMin, thirdRoundMin))
-
     return
 
 if __name__ == '__main__':
